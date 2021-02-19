@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+
+<html>
+
+<head>
+    <title>
+        Star Wars Web
+    </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<body style="background-color: black;">
+    <img style="display:block; margin: 0 auto" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Star_Wars_Logo.svg/640px-Star_Wars_Logo.svg.png">
+    <div class="container">
+        <div style="text-align: center;">
+            <h3 style="color: yellow">Bienvenido a Star Wars Web</h3>
+            <button class="btn btn-success" onclick="search()">Buscar personajes</button>
+        </div>
+
+        <div id="results">
+            <!--countingHTML-->
+        </div>
+
+        <div style="text-align: right;" id="footerPage">
+            <button style="display:none;" id="buttonBack" onclick="back()" class="btn btn-warning"> << </button>
+            <button style="display:none;" id="buttonNext" onclick="next()" class="btn btn-success"> >> </button>
+
+        </div>
+
+    </div>
+
+
+</body>
+
+<script>
+
+    var nextPage = "";
+    var lastPage = "";
+    var currentApiUrl = "";
+
+    function next() {
+        currentApiUrl = nextPage;
+        findStarWarsPeople();
+    }
+
+    function back() {
+        currentApiUrl = lastPage;
+        findStarWarsPeople();
+    }
+
+    function search() {
+        currentApiUrl = "https://swapi.dev/api/people/";
+        findStarWarsPeople();
+    }
+
+
+
+
+    function findStarWarsPeople() {
+        var element = document.getElementById('results').innerHTML = "";
+        debugger;
+
+        var request = new XMLHttpRequest();
+        request.open('GET', currentApiUrl, true);
+
+        request.send();
+
+        request.onreadystatechange = function () {
+
+            if (this.readyState == 4 && this.status == 200) {
+                debugger;
+
+
+                var resultRawData = this.response;
+                data = JSON.parse(resultRawData);
+
+                showApiData(data);
+
+            }
+        }
+    }
+
+    function showApiData(data) {
+        var element = document.getElementById('results');
+        var countingHTML = document.createElement('h4');
+        countingHTML.style.color="yellow";
+        countingHTML.innerHTML = "Cantidad de personajes encontrados: " + data.count;
+        element.appendChild(countingHTML);
+
+        for (var i = 0; i < data.results.length; i++) {
+            var currentItem = data.results[i];
+            var personaje = document.createElement('h5');
+            personaje.style.color="yellow";
+
+            var htmlStyle = "<hr/ ><strong>" + currentItem.name + "</strong>";
+            htmlStyle += "<br>Gender: " + currentItem.gender;
+            personaje.innerHTML = htmlStyle;
+
+            document.getElementById('results').appendChild(personaje);
+        }
+
+
+        if (data.next != null) {
+            document.getElementById("buttonNext").style.display = "inline";
+            nextPage = data.next;
+        } else {
+            document.getElementById("buttonNext").style.display = "none";
+        }
+
+        if (data.previous != null) {
+            document.getElementById("buttonBack").style.display = "inline";
+            lastPage = data.previous;
+        } else {
+            document.getElementById("buttonBack").style.display = "none";
+        }
+    }
+</script>
+
+</html>
